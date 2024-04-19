@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import './App.css'
+import SearchableDropdown from './components/SearchableDropdown/SearchableDropdown';
 
 const App = () => {
   const [readyForSearch, setReadyForSearch] = useState<boolean>(false);
@@ -9,37 +10,57 @@ const App = () => {
   const [summary, setSummary] = useState<string>('');
 
   useEffect(() => {
-    if (readyForSearch) {
-      console.log("About to do a search ...");
-
-      const body = JSON.stringify({
-        firstName: firstName,
-        lastName: lastName
-      });
-
-      // Get user details, if the user exists in the PostgreSQL database.
-      const fetchData = async () => {
-        try {
-          const response = await fetch("http://127.0.0.1:8787", {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: body
-          });
-
-          const data: {role: string, content: string} = await response.json();
-          setSummary(data.content);
-
-        } catch (error) {
-          console.log(error);
-        }
-      };
-
-      fetchData();
-      setReadyForSearch(false);
-    }
+          // Get user details, if the user exists in the PostgreSQL database.
+          const fetchData = async () => {
+            try {
+              const response = await fetch(`http://127.0.0.1:8787?firstName=${firstName}&lastName=${lastName}`);
+    
+              const data = await response.json();
+              // console.log(data);
+    
+            } catch (error) {
+              console.log(error);
+            }
+          };
+    
+          if (readyForSearch) {
+            fetchData();
+            setReadyForSearch(false);
+          }
   }, [readyForSearch]);
+
+  // useEffect(() => {
+  //   if (readyForSearch) {
+  //     console.log("About to do a search ...");
+
+  //     const body = JSON.stringify({
+  //       firstName: firstName,
+  //       lastName: lastName
+  //     });
+
+  //     // Get user details, if the user exists in the PostgreSQL database.
+  //     const fetchData = async () => {
+  //       try {
+  //         const response = await fetch("http://127.0.0.1:8787", {
+  //           method: 'POST',
+  //           headers: {
+  //             'Content-Type': 'application/json'
+  //           },
+  //           body: body
+  //         });
+
+  //         const data: {role: string, content: string} = await response.json();
+  //         setSummary(data.content);
+
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     };
+
+  //     fetchData();
+  //     setReadyForSearch(false);
+  //   }
+  // }, [readyForSearch]);
 
   const handleSetFirstName = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFirstName(event.target.value);
@@ -52,12 +73,8 @@ const App = () => {
   return (
     <Box>
       {/*first and last name search fields */}
-      <Typography variant="h6">Search</Typography>
-      <Box border='solid' borderColor='darkgrey' mb='10px'>
-        <TextField id="first_name" label="First Name" onChange={handleSetFirstName} />
-        y<TextField id="last_name" label="Last Name" onChange={handleSetLastName} />
-      </Box>
-      <Button id="search_button" variant="contained" color="primary" onClick={() => setReadyForSearch(true)}>Search</Button>
+      <SearchableDropdown items={['a', 'b', 'c']} />
+      <Button id="search_button" variant="contained" color="primary" onClick={() => setReadyForSearch(true)} style={{marginTop:'10px'}}>Search</Button>
 
 
       {/*User's details: 
